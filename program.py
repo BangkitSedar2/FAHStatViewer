@@ -78,11 +78,15 @@ class Window(Frame):
         year = self.entry_list["year"].get()
 
         url = get_url(name, search_type, passkey, team, month, year)
-        req = requests.get(url).text
-        results = SearchResult(json.loads(req))
-        self.box.delete(0, END)
-        for result in results.results:
-            self.box.insert(END, "Name: {},     WUs: {},     Rank: {},     Credit: {},     Team: {},     Id: {}".format(result["name"], result["wus"], result["rank"], result["credit"], result["team"], result["id"]))
+        try:
+            req = requests.get(url).text
+            results = SearchResult(json.loads(req))
+            self.box.delete(0, END)
+            for idx, result in enumerate(results.results):
+                self.box.insert(END, "{})     Name: {},     WUs: {},     Rank: {},     Credit: {},     Team: {},     Id: {}".format(idx + 1, result["name"], result["wus"], result["rank"], result["credit"], result["team"], result["id"]))
+        except Exception as x:
+            self.box.insert(END, "Unable to connect to the server. Is your internet connected?")
+            self.box.insert(END, x)
 
 
 def main():
