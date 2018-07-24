@@ -77,13 +77,20 @@ class Window(Frame):
         month = self.entry_list["month"].get()
         year = self.entry_list["year"].get()
 
+        if team and not team.isdigit():
+            self.box.delete(0, END)
+            self.box.insert(END, "Searching via team requires their the teamID, not their name!")
+            return
+
         url = get_url(name, search_type, passkey, team, month, year)
         try:
             req = requests.get(url).text
             results = SearchResult(json.loads(req))
             self.box.delete(0, END)
+            if not results.results:
+                self.box.insert(END, "No data found.")
             for idx, result in enumerate(results.results):
-                self.box.insert(END, "{})     Name: {},     WUs: {},     Rank: {},     Credit: {},     Team: {},     Id: {}".format(idx + 1, result["name"], result["wus"], result["rank"], result["credit"], result["team"], result["id"]))
+                self.box.insert(END, "{}) Name: {},     WUs: {},     Rank: {},     Credit: {},     Team: {},     Id: {}".format(idx + 1, result["name"], result["wus"], result["rank"], result["credit"], result["team"], result["id"]))
         except Exception as x:
             self.box.insert(END, "Unable to connect to the server. Is your internet connected?")
             self.box.insert(END, x)
